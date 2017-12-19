@@ -1,6 +1,7 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pandas as pd
+from urllib.error import HTTPError
 
 from multiprocessing import pool
 from multiprocessing.dummy import Pool as ThreadPool
@@ -50,8 +51,10 @@ for movie_type, movies in movie_book.items():
         # Set max length of the review
         MAX_LENGTH = 300
 
+        url_list = []
+
         # Choose the range of the pages
-        for i in range(1, 50):
+        for i in range(1, 10):
 
             page_number = str(i)
 
@@ -61,13 +64,25 @@ for movie_type, movies in movie_book.items():
             url_link = url + "/?page=" + page_number + "&type=user" + "&sort="
             print('The url address is: ', url_link)
 
-            # Open and get the html content
-            try:
-                html = urlopen(url_link)
+            url_list.append(url_link)
 
+        def open_to_read_html(url):
+            try:
+                result = urlopen(url)
+                return result.read()
+            except HTTPError:
+                print("HTTPError at: ", url)
             except Exception as e:
-                print("Reach the end, break.")
+                print("ERROR")
+            # Open and get the html content
+
             # html = urlopen(url_link)
+        html_list = pool.map(open_to_read_html, url_list)
+        pool.close()
+        pool.join()
+
+
+        for html in html_list:
             url_content = BeautifulSoup(html, 'html.parser')
 
             # Get the framework for every user's review
@@ -95,7 +110,7 @@ for movie_type, movies in movie_book.items():
                 if(half_rate_counter == 0):
                     half_rate_counter = len(review_box.find_all(text=" ½"))
 
-                print(star_counter, half_rate_counter)
+                # print(star_counter, half_rate_counter)
 
                 # Take 1/2 or 1 star as a negative review
                 if((star_counter == 0 and half_rate_counter == 1 or

@@ -98,7 +98,7 @@ def gini_lgb(preds, dtrain):
     return 'gini', score, True
 
 lgb_dataset = lgb.Dataset(train, label=label)
-lgb_params = {'metric': 'accuracy', 'learning_rate': 0.02, 'max_depth': 10, 'num_leaves': 500, 'max_bin': 10, 'objective': 'binary',
+lgb_params = {'metric': 'accuracy', 'learning_rate': 0.02, 'max_depth': 10, 'num_leaves': 200, 'max_bin': 10, 'objective': 'binary',
               'feature_fraction': 0.8, 'bagging_fraction': 0.9, 'bagging_freq': 10}
 
 kfold = 5
@@ -109,7 +109,7 @@ for i, (train_index, test_index) in enumerate(skf.split(X, y)):
     X_train, X_eval = X[train_index], X[test_index]
     y_train, y_eval = y[train_index], y[test_index]
     lgb_model = lgb.train(lgb_params, lgb.Dataset(X_train, label=y_train), nrounds, lgb.Dataset(
-        X_eval, label=y_eval), verbose_eval=100, feval=gini_lgb, early_stopping_rounds=100)
+        X_eval, label=y_eval), verbose_eval=0, feval=gini_lgb, early_stopping_rounds=100)
 
 print(score1.mean())
 print(score2.mean())
