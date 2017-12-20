@@ -1,44 +1,43 @@
-
-2
 from bs4 import BeautifulSoup
 import pandas as pd
 from urllib.error import HTTPError
-
+from urllib.request import urlopen
 import re
 
 '''
   Return a list of top100 movie url
 '''
-def get_top100_url():
 
+
+def get_top100_url():
     return ['https://www.rottentomatoes.com/top/bestofrt/top_100_action__adventure_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_animation_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_art_house__international_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_classics_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_comedy_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_documentary_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_drama_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_horror_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_kids__family_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_musical__performing_arts_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_mystery__suspense_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_romance_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_science_fiction__fantasy_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_special_interest_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_sports__fitness_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_television_movies/',
-    'https://www.rottentomatoes.com/top/bestofrt/top_100_western_movies/']
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_animation_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_art_house__international_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_classics_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_comedy_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_documentary_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_drama_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_horror_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_kids__family_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_musical__performing_arts_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_mystery__suspense_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_romance_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_science_fiction__fantasy_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_special_interest_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_sports__fitness_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_television_movies/',
+            'https://www.rottentomatoes.com/top/bestofrt/top_100_western_movies/']
 
 
 def get_movie_dict():
-
     action_movie = ['hacksaw_ridge', 'blood_father', 'deepwater_horizon',
                     'in_a_valley_of_violence', 'the_magnificent_seven_2016', 'dont_mess_with_texas_2014',
                     'last_airbender', 'gigli', 'babylon_ad', 'drive_2011', 'fantastic_four_2015', 'mortdecai']
 
     romance_movie = ['perfect_man', 'everything_everything_2017',
                      'lost_in_translation', 'enough_said_2013', 'up_in_the_air_2009',
-                     'obvious_child', 'the_duke_of_burgundy', 'la_la_land', 'me_before_you', 'blue_is_the_warmest_color']
+                     'obvious_child', 'the_duke_of_burgundy', 'la_la_land', 'me_before_you',
+                     'blue_is_the_warmest_color']
 
     mystery_movie = ['paranoia_2013', 'mobsters',
                      'the_book_of_henry', 'argo_2012',
@@ -58,13 +57,17 @@ def get_movie_dict():
                   'mystery_movie': mystery_movie, 'comedy_movie': comedy_movie, 'horror_movie': horror_movie}
     return movie_book
 
+
 '''
   Depend on the url extract the movie name.
   :params str url: Input url
   :return str : The movie name
 '''
+
+
 def extract_name_from_url(url):
     return re.search(r'/m.*/reviews', url).group(0).split("/")[2]
+
 
 '''
   Read the html and extract the pos/neg reviews
@@ -73,8 +76,9 @@ def extract_name_from_url(url):
   return: pd.DataFrame: a df contains all the reviews, with label and movie name
 
 '''
-def open_to_read_html(url, MAX_LENGTH=300):
 
+
+def open_to_read_html(url, MAX_LENGTH=300):
     movie_name = extract_name_from_url(url)
     # print(movie_name)
     instant_df = pd.DataFrame()
@@ -83,7 +87,7 @@ def open_to_read_html(url, MAX_LENGTH=300):
         html = urlopen(url)
         url_content = BeautifulSoup(html, 'html.parser')
 
-    # Get the framework for every user's review
+        # Get the framework for every user's review
         for review_box in url_content.find_all('div', class_='col-xs-16'):
 
             # The content of the review
@@ -96,7 +100,7 @@ def open_to_read_html(url, MAX_LENGTH=300):
                 'span', class_='glyphicon glyphicon-star'))
 
             # Take 5-star-review as a positive review
-            if(star_counter == 5 and review_length <= MAX_LENGTH):
+            if (star_counter == 5 and review_length <= MAX_LENGTH):
                 print("Positive review!")
 
                 # Add the positive entry to df
@@ -105,15 +109,15 @@ def open_to_read_html(url, MAX_LENGTH=300):
 
             # Count the 1/2 rating benchmark (0/1)
             half_rate_counter = len(review_box.find_all(text="½"))
-            if(half_rate_counter == 0):
+            if (half_rate_counter == 0):
                 half_rate_counter = len(review_box.find_all(text=" ½"))
 
             # print(star_counter, half_rate_counter)
 
             # Take 1/2 or 1 star as a negative review
-            if((star_counter == 0 and half_rate_counter == 1 or
-                    (star_counter == 1 and half_rate_counter == 0)) and
-               review_length <= MAX_LENGTH):
+            if ((star_counter == 0 and half_rate_counter == 1 or
+                 (star_counter == 1 and half_rate_counter == 0)) and
+                    review_length <= MAX_LENGTH):
                 print("Negative review!")
 
                 # Add the negative entry to df
@@ -128,13 +132,16 @@ def open_to_read_html(url, MAX_LENGTH=300):
         print("ERROR")
         raise e
 
-  '''
-  Use url to create all the links of the reviews.
 
-  :param str url: The origin url address 
-  :param int MAX_RANGE: The max range of page for the movie
-  :return list url_list: A list of url in string
-  '''
+'''
+Use url to create all the links of the reviews.
+
+:param str url: The origin url address 
+:param int MAX_RANGE: The max range of page for the movie
+:return list url_list: A list of url in string
+'''
+
+
 def create_url_list(url, MAX_RANGE=50):
     url_list = []
     for page in range(1, 50):
@@ -145,13 +152,13 @@ def create_url_list(url, MAX_RANGE=50):
     return url_list
 
 
-
 '''
   Get the name of top 100 movie name
   :param str url: the origin address
   :return list movie_list: a list contains all the movie names
 
 '''
+
 
 def get_top100_movie_list(url):
     open_url = urlopen(url)
