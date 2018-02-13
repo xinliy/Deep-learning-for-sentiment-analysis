@@ -1,18 +1,16 @@
 from urllib.request import urlopen
 from urllib.error import HTTPError
 
-
 from bs4 import BeautifulSoup
 import pandas as pd
 
 from multiprocessing import pool
 from multiprocessing.dummy import Pool as ThreadPool
 
-recorder=pd.DataFrame()
+recorder = pd.DataFrame()
 
 
 def collect_review(html, MAX_LENGTH=300):
-
     url_content = BeautifulSoup(html, 'html.parser')
 
     # Get the framework for every user's review
@@ -28,7 +26,7 @@ def collect_review(html, MAX_LENGTH=300):
             'span', class_='glyphicon glyphicon-star'))
 
         # Take 5-star-review as a positive review
-        if(star_counter == 5 and review_length <= MAX_LENGTH):
+        if (star_counter == 5 and review_length <= MAX_LENGTH):
             print("Positive review!")
 
             # Add the positive entry to df
@@ -37,15 +35,15 @@ def collect_review(html, MAX_LENGTH=300):
 
         # Count the 1/2 rating benchmark (0/1)
         half_rate_counter = len(review_box.find_all(text="½"))
-        if(half_rate_counter == 0):
+        if (half_rate_counter == 0):
             half_rate_counter = len(review_box.find_all(text=" ½"))
 
         # print(star_counter, half_rate_counter)
 
         # Take 1/2 or 1 star as a negative review
-        if((star_counter == 0 and half_rate_counter == 1 or
-                (star_counter == 1 and half_rate_counter == 0)) and
-           review_length <= MAX_LENGTH):
+        if ((star_counter == 0 and half_rate_counter == 1 or
+             (star_counter == 1 and half_rate_counter == 0)) and
+                review_length <= MAX_LENGTH):
             print("Negative review!")
 
             # Add the negative entry to df
@@ -66,23 +64,21 @@ class multi_crawler():
     def convert_to_url_page_list(url, max_range=50):
         url_list = []
         for i in range(1, max_range):
-        	page_number = str(i)
-            url_link = url + "/?page=" + page_number + "&type=user" + "&sort="
-            url_list.append(url_link)
-        return url_list
+            page_number = str(i)
+        url_link = url + "/?page=" + page_number + "&type=user" + "&sort="
+        url_list.append(url_link)
 
-    def read_url(url):
-
-    	try:
-    		html=urlopen(url)
-
-    	except HTTPError:
-            print("Http error ar : ", url)
-        except Exception as e:
-            print("ERROR happen at.", url)
-            raise e
-
-        return html
+    return url_list
 
 
+def read_url(url):
+    try:
+        html = urlopen(url)
 
+    except HTTPError:
+        print("Http error ar : ", url)
+    except Exception as e:
+        print("ERROR happen at.", url)
+        raise e
+
+    return html

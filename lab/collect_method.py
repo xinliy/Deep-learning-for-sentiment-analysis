@@ -9,7 +9,14 @@ import re
 '''
 
 
-def get_top100_url():
+def get_top100_url_list():
+    '''
+    Contains the whole list for top 100 movies.
+
+    Returns:
+        A list contains these urls.
+
+    '''
     return ['https://www.rottentomatoes.com/top/bestofrt/top_100_action__adventure_movies/',
             'https://www.rottentomatoes.com/top/bestofrt/top_100_animation_movies/',
             'https://www.rottentomatoes.com/top/bestofrt/top_100_art_house__international_movies/',
@@ -30,6 +37,7 @@ def get_top100_url():
 
 
 def get_movie_dict():
+
     action_movie = ['hacksaw_ridge', 'blood_father', 'deepwater_horizon',
                     'in_a_valley_of_violence', 'the_magnificent_seven_2016', 'dont_mess_with_texas_2014',
                     'last_airbender', 'gigli', 'babylon_ad', 'drive_2011', 'fantastic_four_2015', 'mortdecai']
@@ -58,14 +66,16 @@ def get_movie_dict():
     return movie_book
 
 
-'''
-  Depend on the url extract the movie name.
-  :params str url: Input url
-  :return str : The movie name
-'''
-
-
 def extract_name_from_url(url):
+    '''
+   Depend on the url extract the movie name.
+
+   Args:
+       url: The address for extract the movie name.
+
+   Returns:
+       A string of the movie's name.
+    '''
     return re.search(r'/m.*/reviews', url).group(0).split("/")[2]
 
 
@@ -79,6 +89,20 @@ def extract_name_from_url(url):
 
 
 def open_to_read_html(url, MAX_LENGTH=300):
+    '''
+    Read the html and extract the postive/negative revies.
+
+    Args:
+        url: The url address.
+        MAX_LENGTH: The max length for each review.
+
+    Returns:
+        A DataFrame contains all reviews, with label and movie name.
+
+    Raises:
+        HTTPError: Error when the url address cannot be opened.
+
+    '''
     movie_name = extract_name_from_url(url)
     # print(movie_name)
     instant_df = pd.DataFrame()
@@ -130,7 +154,8 @@ def open_to_read_html(url, MAX_LENGTH=300):
         print("HTTPError at: ", url)
     except Exception as e:
         print("ERROR")
-        raise e
+        print(e)
+        pass
 
 
 '''
@@ -143,12 +168,23 @@ Use url to create all the links of the reviews.
 
 
 def create_url_list(url, MAX_RANGE=50):
+    '''
+    Use url to create all the links of the reviews.
+
+    Args:
+        url: The origin url address.
+        MAX_RANGE: The max range of a page of the movie.
+
+    Returns:
+        A list contains url.
+
+    '''
     url_list = []
     for page in range(1, 50):
         page_number = str(page)
         url_link = url + "/?page=" + page_number + "&type=user" + "&sort="
         url_list.append(url_link)
-    print(url_list)
+    map(print(*url_list,sep='\n'),url_list)
     return url_list
 
 
@@ -160,7 +196,17 @@ def create_url_list(url, MAX_RANGE=50):
 '''
 
 
-def get_top100_movie_list(url):
+def get_top100_movie_name_list(url):
+    '''
+    Get the name of top 100 movie names.
+
+    Args:
+        url: The origin address
+
+    Returns:
+        A list contains all movie names.
+
+    '''
     open_url = urlopen(url)
 
     html = BeautifulSoup(open_url, 'html.parser')
@@ -178,5 +224,5 @@ def get_top100_movie_list(url):
             pass
 
     movie_list = list(set(movie_list))
-    print(movie_list)
+    print(len(movie_list))
     return movie_list
