@@ -16,7 +16,7 @@ def get_top100_url_list():
     Returns:
         A list contains these urls.
 
-    '''
+    # '''
     return ['https://www.rottentomatoes.com/top/bestofrt/top_100_action__adventure_movies/',
             'https://www.rottentomatoes.com/top/bestofrt/top_100_animation_movies/',
             'https://www.rottentomatoes.com/top/bestofrt/top_100_art_house__international_movies/',
@@ -35,194 +35,185 @@ def get_top100_url_list():
             'https://www.rottentomatoes.com/top/bestofrt/top_100_television_movies/',
             'https://www.rottentomatoes.com/top/bestofrt/top_100_western_movies/']
 
+    def get_movie_dict():
+        action_movie = ['hacksaw_ridge', 'blood_father', 'deepwater_horizon',
+                        'in_a_valley_of_violence', 'the_magnificent_seven_2016', 'dont_mess_with_texas_2014',
+                        'last_airbender', 'gigli', 'babylon_ad', 'drive_2011', 'fantastic_four_2015', 'mortdecai']
 
-def get_movie_dict():
+        romance_movie = ['perfect_man', 'everything_everything_2017',
+                         'lost_in_translation', 'enough_said_2013', 'up_in_the_air_2009',
+                         'obvious_child', 'the_duke_of_burgundy', 'la_la_land', 'me_before_you',
+                         'blue_is_the_warmest_color']
 
-    action_movie = ['hacksaw_ridge', 'blood_father', 'deepwater_horizon',
-                    'in_a_valley_of_violence', 'the_magnificent_seven_2016', 'dont_mess_with_texas_2014',
-                    'last_airbender', 'gigli', 'babylon_ad', 'drive_2011', 'fantastic_four_2015', 'mortdecai']
+        mystery_movie = ['paranoia_2013', 'mobsters',
+                         'the_book_of_henry', 'argo_2012',
+                         'arrival_2016', 'skyfall',
+                         'kingsman_the_secret_service', 'a_most_wanted_man',
+                         'the_drop', 'gone_girl']
 
-    romance_movie = ['perfect_man', 'everything_everything_2017',
-                     'lost_in_translation', 'enough_said_2013', 'up_in_the_air_2009',
-                     'obvious_child', 'the_duke_of_burgundy', 'la_la_land', 'me_before_you',
-                     'blue_is_the_warmest_color']
+        comedy_movie = ['baywatch_2017', 'the_house_2017', 'snatched_2017',
+                        'the_artist', 'ratatouille', 'the_disaster_artist',
+                        'submarine-2010', 'burnt', 'ted_2', 'american_ultra']
 
-    mystery_movie = ['paranoia_2013', 'mobsters',
-                     'the_book_of_henry', 'argo_2012',
-                     'arrival_2016', 'skyfall',
-                     'kingsman_the_secret_service', 'a_most_wanted_man',
-                     'the_drop', 'gone_girl']
+        horror_movie = ['the_dark_tower_2017', 'the_mummy_2017', 'wish_upon',
+                        'get_out', 'the_babadook', 'pans_labyrinth', 'the_loved_ones_2012',
+                        'the_conjuring_2', 'the_shallows', 'lights_out_2016', 'ouija_origin_of_evil']
 
-    comedy_movie = ['baywatch_2017', 'the_house_2017', 'snatched_2017',
-                    'the_artist', 'ratatouille', 'the_disaster_artist',
-                    'submarine-2010', 'burnt', 'ted_2', 'american_ultra']
+        movie_book = {'action_movie': action_movie, 'romance_movie': romance_movie,
+                      'mystery_movie': mystery_movie, 'comedy_movie': comedy_movie, 'horror_movie': horror_movie}
+        return movie_book
 
-    horror_movie = ['the_dark_tower_2017', 'the_mummy_2017', 'wish_upon',
-                    'get_out', 'the_babadook', 'pans_labyrinth', 'the_loved_ones_2012',
-                    'the_conjuring_2', 'the_shallows', 'lights_out_2016', 'ouija_origin_of_evil']
+    def extract_name_from_url(url):
+        '''
+       Depend on the url extract the movie name.
 
-    movie_book = {'action_movie': action_movie, 'romance_movie': romance_movie,
-                  'mystery_movie': mystery_movie, 'comedy_movie': comedy_movie, 'horror_movie': horror_movie}
-    return movie_book
+       Args:
+           url: The address for extract the movie name.
 
-
-def extract_name_from_url(url):
-    '''
-   Depend on the url extract the movie name.
-
-   Args:
-       url: The address for extract the movie name.
-
-   Returns:
-       A string of the movie's name.
-    '''
-    return re.search(r'/m.*/reviews', url).group(0).split("/")[2]
-
-
-'''
-  Read the html and extract the pos/neg reviews
-  params: str url: the url address
-  params: int MAX_LENGTH(Default:300): the max length for each review
-  return: pd.DataFrame: a df contains all the reviews, with label and movie name
-
-'''
-
-
-def open_to_read_html(url, MAX_LENGTH=300):
-    '''
-    Read the html and extract the postive/negative revies.
-
-    Args:
-        url: The url address.
-        MAX_LENGTH: The max length for each review.
-
-    Returns:
-        A DataFrame contains all reviews, with label and movie name.
-
-    Raises:
-        HTTPError: Error when the url address cannot be opened.
+       Returns:
+           A string of the movie's name.
+        '''
+        return re.search(r'/m.*/reviews', url).group(0).split("/")[2]
 
     '''
-    movie_name = extract_name_from_url(url)
-    # print(movie_name)
-    instant_df = pd.DataFrame()
-
-    try:
-        html = urlopen(url)
-        url_content = BeautifulSoup(html, 'html.parser')
-
-        # Get the framework for every user's review
-        for review_box in url_content.find_all('div', class_='col-xs-16'):
-
-            # The content of the review
-            review = review_box.find(
-                'div', class_='user_review').get_text().lstrip()
-            review_length = len(review)
-
-            # Count the length of stars (0-5)
-            star_counter = len(review_box.find_all(
-                'span', class_='glyphicon glyphicon-star'))
-
-            # Take 5-star-review as a positive review
-            if (star_counter == 5 and review_length <= MAX_LENGTH):
-                print("Positive review!")
-
-                # Add the positive entry to df
-                instant_df = instant_df.append(
-                    {'review': review, 'label': 1, 'name': movie_name}, ignore_index=True)
-
-            # Count the 1/2 rating benchmark (0/1)
-            half_rate_counter = len(review_box.find_all(text="½"))
-            if (half_rate_counter == 0):
-                half_rate_counter = len(review_box.find_all(text=" ½"))
-
-            # print(star_counter, half_rate_counter)
-
-            # Take 1/2 or 1 star as a negative review
-            if ((star_counter == 0 and half_rate_counter == 1 or
-                 (star_counter == 1 and half_rate_counter == 0)) and
-                    review_length <= MAX_LENGTH):
-                print("Negative review!")
-
-                # Add the negative entry to df
-                instant_df = instant_df.append(
-                    {'review': review, 'label': 0, 'name': movie_name}, ignore_index=True)
-        print(instant_df.shape)
-        return instant_df
-
-    except HTTPError:
-        print("HTTPError at: ", url)
-    except Exception as e:
-        print("ERROR")
-        print(e)
-        pass
-
-
-'''
-Use url to create all the links of the reviews.
-
-:param str url: The origin url address 
-:param int MAX_RANGE: The max range of page for the movie
-:return list url_list: A list of url in string
-'''
-
-
-def create_url_list(url, MAX_RANGE=50):
+      Read the html and extract the pos/neg reviews
+      params: str url: the url address
+      params: int MAX_LENGTH(Default:300): the max length for each review
+      return: pd.DataFrame: a df contains all the reviews, with label and movie name
+    
     '''
-    Use url to create all the links of the reviews.
 
-    Args:
-        url: The origin url address.
-        MAX_RANGE: The max range of a page of the movie.
+    def open_to_read_html(url, MAX_LENGTH=300):
+        '''
+        Read the html and extract the postive/negative revies.
 
-    Returns:
-        A list contains url.
+        Args:
+            url: The url address.
+            MAX_LENGTH: The max length for each review.
 
-    '''
-    url_list = []
-    for page in range(1, 50):
-        page_number = str(page)
-        url_link = url + "/?page=" + page_number + "&type=user" + "&sort="
-        url_list.append(url_link)
-    map(print(*url_list,sep='\n'),url_list)
-    return url_list
+        Returns:
+            A DataFrame contains all reviews, with label and movie name.
 
+        Raises:
+            HTTPError: Error when the url address cannot be opened.
 
-'''
-  Get the name of top 100 movie name
-  :param str url: the origin address
-  :return list movie_list: a list contains all the movie names
+        '''
+        movie_name = extract_name_from_url(url)
+        # print(movie_name)
+        instant_df = pd.DataFrame()
 
-'''
-
-
-def get_top100_movie_name_list(url):
-    '''
-    Get the name of top 100 movie names.
-
-    Args:
-        url: The origin address
-
-    Returns:
-        A list contains all movie names.
-
-    '''
-    open_url = urlopen(url)
-
-    html = BeautifulSoup(open_url, 'html.parser')
-    movie_list = []
-    for a in html.find('table', class_="table").find_all("a", href=True):
-        href = a['href']
-
-        true_href = re.search(r'm/.*', href)
-        # group() will rasie error if not found
         try:
-            movie_name = true_href.group(0).split("/")[1]
-            movie_list.append(movie_name)
+            html = urlopen(url)
+            url_content = BeautifulSoup(html, 'html.parser')
 
+            # Get the framework for every user's review
+            for review_box in url_content.find_all('div', class_='col-xs-16'):
+
+                # The content of the review
+                review = review_box.find(
+                    'div', class_='user_review').get_text().lstrip()
+                review_length = len(review)
+
+                # Count the length of stars (0-5)
+                star_counter = len(review_box.find_all(
+                    'span', class_='glyphicon glyphicon-star'))
+
+                # Take 5-star-review as a positive review
+                if (star_counter == 5 and review_length <= MAX_LENGTH):
+                    # print("Positive review!")
+
+                    # Add the positive entry to df
+                    instant_df = instant_df.append(
+                        {'review': review, 'label': 1, 'name': movie_name}, ignore_index=True)
+
+                # Count the 1/2 rating benchmark (0/1)
+                half_rate_counter = len(review_box.find_all(text="½"))
+                if (half_rate_counter == 0):
+                    half_rate_counter = len(review_box.find_all(text=" ½"))
+
+                # print(star_counter, half_rate_counter)
+
+                # Take 1/2 or 1 star as a negative review
+                if ((star_counter == 0 and half_rate_counter == 1 or
+                     (star_counter == 1 and half_rate_counter == 0)) and
+                        review_length <= MAX_LENGTH):
+                    # print("Negative review!")
+
+                    # Add the negative entry to df
+                    instant_df = instant_df.append(
+                        {'review': review, 'label': 0, 'name': movie_name}, ignore_index=True)
+            # print(instant_df['label'].value_counts())
+            return instant_df
+
+        except HTTPError:
+            print("HTTPError at: ", url)
         except Exception as e:
+            print("ERROR")
+            print(e)
             pass
 
-    movie_list = list(set(movie_list))
-    print(len(movie_list))
-    return movie_list
+    '''
+    Use url to create all the links of the reviews.
+    
+    :param str url: The origin url address 
+    :param int MAX_RANGE: The max range of page for the movie
+    :return list url_list: A list of url in string
+    '''
+
+    def create_url_list(url, MAX_RANGE=50):
+        '''
+        Use url to create all the links of the reviews.
+
+        Args:
+            url: The origin url address.
+            MAX_RANGE: The max range of a page of the movie.
+
+        Returns:
+            A list contains url.
+
+        '''
+        url_list = []
+        for page in range(1, 50):
+            page_number = str(page)
+            url_link = url + "/?page=" + page_number + "&type=user" + "&sort="
+            url_list.append(url_link)
+        # map(print(*url_list,sep='\n'),url_list)
+        return url_list
+
+    '''
+      Get the name of top 100 movie name
+      :param str url: the origin address
+      :return list movie_list: a list contains all the movie names
+    
+    '''
+
+    def get_top100_movie_name_list(url):
+        '''
+        Get the name of top 100 movie names.
+
+        Args:
+            url: The origin address
+
+        Returns:
+            A list contains all movie names.
+
+        '''
+        open_url = urlopen(url)
+
+        html = BeautifulSoup(open_url, 'html.parser')
+        movie_list = []
+        for a in html.find('table', class_="table").find_all("a", href=True):
+            href = a['href']
+
+            true_href = re.search(r'm/.*', href)
+            # group() will rasie error if not found
+            try:
+                movie_name = true_href.group(0).split("/")[1]
+                movie_list.append(movie_name)
+
+            except Exception as e:
+                pass
+
+        movie_list = list(set(movie_list))
+        # print(len(movie_list))
+        return movie_list

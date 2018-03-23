@@ -1,13 +1,13 @@
-import numpy as np
 import pandas as pd
-import collect_method
 
 
+df1=pd.read_csv('100.csv')
+print(df1['label'].value_counts())
+df2=df1.loc[df1['label']==0]
+df3=df1.loc[df1['label']==1][:1817]
+print(df3['label'].value_counts())
+df4=pd.concat([df2,df3])
+print(df4['label'].value_counts())
 
-
-c=[movie for url in collect_method.get_top100_url_list()
-   for movie in collect_method.get_top100_movie_name_list(url)]
-
-
-print(np.array(c).shape)
-print(c)
+df4.to_csv('action_selected.csv',index=False)
+# print(df2)
