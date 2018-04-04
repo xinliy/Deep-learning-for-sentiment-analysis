@@ -16,7 +16,7 @@ def get_top100_url_list():
     Returns:
         A list contains these urls.
 
-    # '''
+    '''
     return ['https://www.rottentomatoes.com/top/bestofrt/top_100_action__adventure_movies/',
             'https://www.rottentomatoes.com/top/bestofrt/top_100_animation_movies/',
             'https://www.rottentomatoes.com/top/bestofrt/top_100_art_house__international_movies/',
@@ -119,7 +119,7 @@ def get_top100_url_list():
                     'span', class_='glyphicon glyphicon-star'))
 
                 # Take 5-star-review as a positive review
-                if (star_counter == 5 and review_length <= MAX_LENGTH):
+                if star_counter == 5 and review_length <= MAX_LENGTH:
                     # print("Positive review!")
 
                     # Add the positive entry to df

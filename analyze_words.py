@@ -48,17 +48,16 @@ def clean_doc(doc):
     tokens = [word for word in tokens if len(word) > 1]
 
     # st = SnowballStemmer(language='english')
-    # st = LancasterStemmer()
     # tokens = [st.stem(word) for word in tokens]
     return tokens
 
 def list_to_string(list1):
     return " ".join(str(e) for e in list1)
 
-dataset.review=dataset.review.apply(clean_doc)
-dataset.review=dataset.review.apply(list_to_string)
-dataset.to_csv('nsbalanced_dataset.csv',index=False)
-print(dataset.head())
+# dataset.review=dataset.review.apply(clean_doc)
+# dataset.review=dataset.review.apply(list_to_string)
+# dataset.to_csv('finalSet.csv',index=False)
+# print(dataset.head())
 data=dataset
 
 
@@ -73,7 +72,7 @@ data=dataset
 #     sentence_list.append(sentence)
 
 # vec = CountVectorizer(min_df=1, lowercase=True,stop_words='english')
-tf_vec=TfidfVectorizer(ngram_range=(1,3),max_features=10000,stop_words='english')
+tf_vec=TfidfVectorizer(ngram_range=(1,3),max_features=4000,stop_words='english')
 
 # print(sentence_list)
 # data_vectorized = vec.fit_transform(data.review)

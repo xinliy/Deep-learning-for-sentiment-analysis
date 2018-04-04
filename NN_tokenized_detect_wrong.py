@@ -5,12 +5,12 @@ import keras
 from sklearn.model_selection import train_test_split
 
 
-dataset=pd.read_csv('finalSet.csv')
+dataset=pd.read_csv('balanced_dataset.csv')
 dataset.reset_index()
 dataset['id']=dataset.index
 
 
-num_word=8000
+num_word=4000
 tk=Tokenizer(num_words=num_word)
 tk.fit_on_texts(dataset.review)
 x=tk.texts_to_matrix(dataset.review)
@@ -27,7 +27,7 @@ model.compile(loss='binary_crossentropy',optimizer='rmsprop',metrics=['acc'])
 
 
 
-result=model.fit(x_train,y_train,batch_size=128,epochs=5,validation_split=0.2)
+result=model.fit(x_train,y_train,batch_size=128,epochs=2,validation_split=0.2)
 
 print(result.history['val_acc'])
 

@@ -65,18 +65,7 @@ for train,test in kfold.split(x,y):
     result=model.fit(x[train],y[train],validation_data=(x[test],y[test]),batch_size=batch_size,epochs=epochs,validation_split=0.1)
     cvscores.append(result.history['val_acc'])
     y_pred=model.predict(x[test])
-    # y_pred=np.round(y_pred)
-    # count=0
-    # total=0
-    # for y_true,yp in zip(y[test],y_pred):
-    #     print(int(y_true))
-    #     print(int(yp[0]))
-    #     print('___')
-    #     if int(y_true)==0:
-    #         count=count+1
-    #         if int(yp[0])==1:
-    #             total=total+1
-    #             # print('yes!')
+
 
     print("The precision for negative label is: ",my_toolkit.negative_precision(y[test],y_pred))
 
